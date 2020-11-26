@@ -1,0 +1,73 @@
+\documentclass[
+  10pt
+%, handout
+]{beamer}
+%\setbeameroption{show notes on second screen}
+
+% TODO: What is this for?
+\usepackage{pgfpages}
+\usepackage{pdfpages}
+
+% Use T1 Font encoding to support more glyphs
+\usepackage[T1]{fontenc}
+
+% Number sections in table of contents
+\setbeamertemplate{section in toc}[sections numbered]
+% Hide subsections in table of contents
+\setcounter{tocdepth}{1}
+
+% Use HPE beamer theme
+\usetheme{HPE}
+
+% Also number pages in appendix
+\usepackage{appendixnumberbeamer}
+
+% Nicer tables
+\usepackage{booktabs}
+
+\usepackage[normalem]{ulem}
+
+\usepackage[scale=2]{ccicons}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+
+\usepackage{graphicx}
+\usepackage{listings}
+
+\usepackage{lmodern}
+
+\usepackage{eurosym}
+\usepackage{amsmath, amssymb}
+\usepackage[binary-units=true]{siunitx}
+\DeclareSIUnit{\EUR}{\text{\euro}}
+
+\usepackage{xcolor}
+\newcommand\crule[3][black]{\textcolor{#1}{\rule{#2}{#3}}}
+
+\newcommand{\tinycite}[1]{\tiny{(\cite{#1})}}
+%\newcommand{\tinycite}[1]{foo}
+
+\title{SPDM}
+\subtitle{Authenticating devices}
+\date{26. November 2020}
+\author{Daniel Schaefer}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Agenda}
+  \begin{itemize}
+    \item One
+    \item Two
+    \item Three
+  \end{itemize}
+  %\tableofcontents[pausesections]
+\end{frame}
+
+\end{document}
