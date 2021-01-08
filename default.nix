@@ -45,7 +45,7 @@ let
     };
 in
   stdenv.mkDerivation rec {
-    name = "presentation-template";
+    name = "riscv-fosdem21";
 
     src = ./.;
 

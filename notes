@@ -1,0 +1,25 @@
+- Who are we
+- What
+  - Goal: Make EDK2 UEFI boot on RISC-V
+- History of the implementation
+  - Start 2016 by Abner
+  - Implemented QEMU PC/AT-compatible system with RISC-V, abandoned
+- History of booting on RISC-V
+  - BBL
+  - 
+- Architecture of EDK2 on RISC-V
+- Booting Linux
+  - 
+- Full Details of Booting on Hifive Unleashed and QEMU
+  - Mask ROM to EFISTUB
+- Demo booting to Linux
+- Goals for the future of this implementation
+- Vision for the future
+  - Make booting RISC-V boring, like ARM has recently done
+  - RISC-V desktops and servers!
+ 
+
+
+Qs to Abner:
+- Tell me about the history
+- Anything special you want to include?
