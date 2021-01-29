@@ -1,22 +1,9 @@
 - https://hpe-my.sharepoint.com/:p:/r/personal/daniel_schaefer_hpe_com/_layouts/15/Doc.aspx?sourcedoc=%7BDF8C3750-DAE2-4AC0-B20C-D5AA40B3CA5C%7D&file=RISC-V%20EDK2%20Port%20Design%20Architecture.pptx&action=edit&mobileredirect=true&cid=ebc52921-6881-41f9-8e3e-b10ff1cb05d9
 
-- Who are we
-  -
-- What
-  - Goal: Make EDK2 UEFI boot on RISC-V
-
-
 - History of the implementation
   - Start 2016 by Abner
   - Implemented QEMU PC/AT-compatible system with RISC-V, abandoned because ... why?
   - OpenSBI
-
-- History of booting on RISC-V
-  - BBL
-  - OpenSBI
-    - 
-  - Uboot
-  - Oreboot
 
 - Architecture of EDK2 on RISC-V
   - SEC
@@ -32,49 +19,12 @@
     -> Embed bootloader and kernel into FW image
   - Atish was in the process of implementing RISC-V UEFI stub for Linux
     We tested together and made sure it works
-  - loadlinux instead 
-
-- Full Details of Booting on Hifive Unleashed and QEMU
-  - Mask ROM to EFISTUB
-
-- Demo booting to Linux
-
-- Status overview
-  - Basic architecture and platform support upstreamed into edk2 and edk2-platforms
-  - UEFI and SMBIOS spec changed
-  - SMBIOS implemented
-  - SCT ported and posted patches, need to revise
-
-  Platform Name             & EFI Shell & Boot loader   Linux Kernel
-  Freedom U500 VC707 FPGA   & Yes       & N/A         & N/A
-  HiFive Unleashed (QEMU)   & Yes       & GRUB2 WIP, Systemd-boot WIP   Yes
-  HiFive Unleashed          & Yes       & N/A         & Yes
-  VirtIO machine (QEMU)     & N/A       & N/A         & N/A
-  AX25 + AE350 FPGA         & N/A       & N/A         & N/A
-  BeagleV
 
 - Goals for the future of this implementation
-  - QEMU virt target -> Enable CI build and boot tests
   - BeagleV [3]
-  - SD card driver
-  - Implement ResetSystem RT service, recently added to SBI draft [2]
-  - Implement relocations used by new GNU toolchain versions [1]
   - FWTS (?)
-
-- Vision for the future
-  - Make booting RISC-V boring, like ARM has recently done (SBBR, EBBR, ...)
-  - RISC-V desktops and servers!
-
-Resources:
-- https://github.com/riscv/riscv-sbi-doc
-- https://github.com/riscv/riscv-uefi-edk2-docs
-- https://github.com/riscv/riscv-edk2
-- https://github.com/riscv/riscv-edk2-platforms
-- [1] https://github.com/riscv/riscv-edk2/issues/3
-- [2] https://github.com/riscv/riscv-sbi-doc/commit/2f101582210b17a61e2f2bd356a01c6bda467ed0
-- [3] https://beagleboard.org/beaglev
-
 
 Qs to Abner:
 - Tell me about the history
 - Anything special you want to include?
+- Do we lock PMP at the end of PEI? Comment says so but I can't find anything
