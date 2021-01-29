@@ -51,11 +51,10 @@
 \newcommand{\tinycite}[1]{\tiny{(\cite{#1})}}
 %\newcommand{\tinycite}[1]{foo}
 
-\title{SPDM}
-\subtitle{Authenticating devices}
-\date{26. November 2020}
+\title{Porting EDK2 UEFI to RISC-V}
+%\subtitle{}
+\date{6. September 2021}
 \author{Daniel Schaefer}
-
 
 \begin{document}
 
@@ -63,9 +62,35 @@
 
 \begin{frame}{Agenda}
   \begin{itemize}
-    \item One
-    \item Two
-    \item Three
+    \item UEFI on RISC-V
+      % Explain what this is all about
+      % That we ported the reference implementation of UEFI, namely EDK2 to RISC-V
+      % Mhh forgot what else
+    \item History of booting on RISC-V
+      % Explain how RISC-V was initially booted,
+      % How U-Boot has become the default and how Edk2 can possibly become the second default
+      % Also mention oreboot as a recent mature implementation
+    \item History of the implementation
+      % Explain the history, how Abner got started in 2016
+      % how he implemented a PC-AT version of RISC-V in qemu and abandoned it
+      % How OpenSBI revived it
+      % How we upstreamed it in 2020
+      % And how we're currently working on and upstreaming Linux support
+    \item Architecture of EDK2 on RISC-V
+      % Self-explaining
+    \item Booting to Linux
+      % Explain the steps that were required to make Linux boot
+      % and show the details
+    \item Full Details of Booting on Hifive Unleashed and QEMU
+      % Quickly go through all of the details to give an walkthrough from beginning to end
+    \item Demo booting to Linux
+      % Prove that it works
+    \item Goals for the future of this implementation
+      % List and explain concrete issues and TODO items for us and other's who want to help
+      % Call to action
+    \item Vision for the future
+      % Explain that we want to make RISC-V boot like current systems
+      % Like the ARM people say "make booting boring"
   \end{itemize}
   %\tableofcontents[pausesections]
 \end{frame}
