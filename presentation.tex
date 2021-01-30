@@ -16,7 +16,7 @@
 % Hide subsections in table of contents
 \setcounter{tocdepth}{1}
 
-\usetheme{metropolis}
+\usetheme{HPE}
 
 % Also number pages in appendix
 \usepackage{appendixnumberbeamer}
@@ -53,8 +53,8 @@
 \newcommand{\tinycite}[1]{\tiny{(\cite{#1})}}
 %\newcommand{\tinycite}[1]{foo}
 
-\title{Porting EDK2 UEFI to RISC-V}
-\subtitle{Open Source Firmware, BMC and Bootloader devroom}
+\title{EDK2 UEFI on RISC-V}
+\subtitle{Open Source Firmware, BMC and Bootloader Devroom}
 \date{February 6, FOSDEM 2021}
 \author{Daniel Schaefer}
 
@@ -64,28 +64,14 @@
 
 \begin{frame}{Agenda}
   \begin{itemize}
-    \item About us
-    \item History of booting on RISC-V
-      % Explain how RISC-V was initially booted,
-      % How U-Boot has become the default and how Edk2 can possibly become the second default
-      % Also mention oreboot as a recent mature implementation
-    \item UEFI on RISC-V
-    \item History of the implementation
-      % Explain the history, how Abner got started in 2016
-      % how he implemented a PC-AT version of RISC-V in qemu and abandoned it
-      % How OpenSBI revived it
-      % How we upstreamed it in 2020
-      % And how we're currently working on and upstreaming Linux support
-    \item Architecture of EDK2 on RISC-V
-      % Self-explaining
-    \item Booting to Linux
-      % Explain the steps that were required to make Linux boot
-      % and show the details
-    \item Full Details of Booting on Hifive Unleashed and QEMU
-      % Quickly go through all of the details to give an walkthrough from beginning to end
-    \item Demo booting to Linux
-    \item Goals for the future of this implementation
-    \item Vision for the future
+    \item About Us
+    \item Introduction
+    \item History of Booting on RISC-V
+    \item Timeline of This Implementation
+    \item Details of Bootflow
+    \item Demo Booting to Linux
+    \item Status, Goals, Vision
+    \item How to Help
   \end{itemize}
   %\tableofcontents
 \end{frame}
@@ -93,7 +79,8 @@
 \begin{frame}{About us}
   \begin{itemize}
     \item UEFI Firmware Engineers for ProLiant Servers at HPE
-    \item Great learning opportunity: Changes required in entire  UEFI boot flow
+    \item Learned a lot through this project:\\
+          Changes required in entire UEFI/EDK2 boot flow
     % TODO: Maybe
     % From SEC through to starting the bootloader (EFISTUB)
   \end{itemize}
@@ -107,8 +94,8 @@
       \caption{Abner Chang}
     \end{figure}
     \begin{itemize}
-      \item Working on UEFI for many years
-      \item Started the project 
+      \item Senior UEFI Engineer
+      \item Lead the project 
     \end{itemize}
 
     \column{0.5\textwidth}
@@ -119,15 +106,15 @@
 
     \begin{itemize}
       \item Graduated last year
-      \item First full-time UEFI project
+      \item First real UEFI project
     \end{itemize}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Disclaimer}
-  % We did the work mostly at work as a side project
-  % But
-\end{frame}
+%\begin{frame}{Disclaimer}
+%  % We did the work mostly at work as a side project
+%  % But ...
+%\end{frame}
 
 \begin{frame}{EDK2}
   \centering
@@ -138,9 +125,9 @@
   \begin{itemize}
     \item UEFI is only an interface specification
     \item EDK2 is the reference implementation of UEFI
-    \item Initially developed for Itanium
+    \item Initially developed for Itanium 
     \item Now mainstream for x86\_64
-    \item ARM % Aarch32 since 2009, Aarch64 since 2013, part of BBR standards...
+    \item Starting to get adopted on ARM % Aarch32 since 2009, Aarch64 since 2013, part of BBR standards...
   \end{itemize}
 \end{frame}
 
@@ -157,10 +144,10 @@
     \item Three privilege modes (\textbf{M}achine, \textbf{S}upervisor, \textbf{U}ser)
       % Implementations are only required to provide Machine
       % There's now also, optionally, Hypervisor
-    \item Similar to x86 boot starts without MMU in Machine mode
+    \item Similar to x86, boot starts without MMU in Machine mode
       % Firmare and OS have to enable MMU and transition to S&M
     \item FW can stay resident after boot and be called by higher layers \\
-          Like x86's SMM but with well defined interface like Itanium's PAL/SAL \\
+          Like x86's SMM but with well defined interface like Itanium's SAL \\
           $\rightarrow$ Supervisor Binary Interface (SBI)
   \end{itemize}
 \end{frame}
@@ -174,127 +161,208 @@
 % Calling SBI works the same way as userspace makes kernel calls (syscall or ecall in RISC-V)
 
 \begin{frame}{History of booting on RISC-V}
-  \begin{itemize}
-    \item 201? BBL % Berkeley Boot Loader, original research bootloader
-    \item 2016 EDK2 Prototype with QEMU RISC-V PC/AT board % [4]
-    \item 201? U-Boot+OpenSBI
-    \item 2020 EDK2+OpenSBI Upstream
-    \item 201? U-Boot+OpenSBI with UEFI interface
-
-    \item 20?? Coreboot
-    \item 20?? Oreboot
-  \end{itemize}
+  \begin{tabular}{ll}
+    2015 & BBL \\ % Berkeley Boot Loader, original research bootloader
+    2016 & EDK2 Prototype with QEMU RISC-V PC/AT board\textsuperscript{\tiny [5]} \\
+    2017 & U-Boot+OpenSBI \\
+    2018 & U-Boot+OpenSBI with UEFI interface \\
+    2018 & Coreboot \\
+    2019 & Oreboot \\ % First version of Oreboot
+    2020 & EDK2+OpenSBI Upstream \\
+  \end{tabular}
 \end{frame}
 
 \begin{frame}{Timeline of this implementation}
+  \begin{tabular}{ll}
+    2015 & Started at HPE \\
+    2016 & Prototype presented at UEFI Forum Plugfest \\
+    2020 & Initial upstreaming to EDK2 \\
+         & Booting to UEFI shell on Hifive Unleashed \\
+    2021 & Upstream Linux EFISTUB support (WIP) \\
+    2021 & Port more boards, e.g. BeagleV (WIP) \\
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Bootflow on SiFive U540}
+  \begin{center}
+    Example based on Hifive Unleashed and equivalent sifive\_u QEMU
+
+    \vfill
+
+    \includegraphics[width=0.8\textwidth]{resources/bootflow.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Bootflow on SiFive U540}
+    \includegraphics[width=1.15\textwidth]{resources/bootflow-annotated.png}
+\end{frame}
+
+\begin{frame}{Reset at ZSBL}
   \begin{itemize}
-    \item 2015: Started by Abner
-    \item 2015: Started by Abner
+    \item Starts running in M-Mode without MMU
+    \item ZSBL (zero stage bootloader)
+  \end{itemize}
+
+  \begin{itemize}
+    \item Embedded in mask ROM or hardcoded in QEMU source
+    \item Jumps to predefined address % We put QEMU there
   \end{itemize}
 \end{frame}
 
-% Think about how to integrate Abner's diagram
+\begin{frame}{SEC - First phase of UEFI (ASM)}
+  \begin{itemize}
+    \item Fully custom
+    \item Starts in ASM % Very easy to write, compared to x86
+  \end{itemize}
 
-\begin{frame}{Details}
-% -------
-Example based on Hifive Unleashed (U540) and equivalent sifive\_u QEMU model
+  \begin{enumerate}
+    \item Set up scratch register (mscratch) % Used to pass information to sbi_init
+    \item Set up stack in temporary RAM
+    \item Set up trap handler to preserve registers and call OpenSBI
+    %- Set up trap handler
+    %  - Check privilege mode
+    %  - Save registers
+    %  - Call OpenSBI's trap handler
+    %  - Restore registers
+    \item Calls SEC core C function with hartid and scratch pointer
+  \end{enumerate}
 
-Starts running in M-Mode
+  % Platform/RISC-V/PlatformPkg/Universal/Sec/Riscv64/SecEntry.S
+\end{frame}
 
-ZSBL (zero stage bootloader)
-  Embedded in mask ROM or hardcoded in QEMU source
-  Jumps to predefined address, so we need to put our FW there
+\begin{frame}{SEC - First phase of UEFI (C)}
+  \begin{enumerate}
+    \item Add UEFI private region in scratch space
+    \begin{itemize}
+      \item machine information (march, mimpid, ...)
+      \item Function pointer to switch mode
+    \end{itemize}
+    \item Initialize OpenSBI (sbi\_init)
+    \begin{itemize}
+      \item Stall non-booting harts
+    \end{itemize}
+  \end{enumerate}
+  % Platform/RISC-V/PlatformPkg/Universal/Sec/SecMain.c
+\end{frame}
 
-SEC
-  - Starts in ASM
-  - Set up scratch register
-  - Set up stack in temporary RAM
-  - Set up trap handler
-    - Check privilege mode
-    - Save registers
-    - Call OpenSBI's trap handler
-    - Restore registers
-  - Call SecCore C function with hartid (mhartid) scratch pointer (mscratch)
-    - Save some machine information from registers in private space in scratch space
-      - march
-      - Also OpenSBI function to switch mode
-  - Initialize OpenSBI passing it scratch pointer with
-    - device tree % OpenSBI wants to fix it up in sbi_init, not sure if that's still necessary
-    - next mode (M-Mode still)
-    - platform specific functions
-      - PLIC, CLIC config
-      - PMP config to make SEC and PEI code rx only, adapted from OpenSBI source file
-  - Initialize possibly other harts and stall them, only one hart will continue to boot
-  - Register custom SBI calls
-    - To get mscratch for current or arbitrary hart
-    - We don't want to call the library after SEC, so we use SBI ecalls
-    - TODO: Should deregister this later because it's only supposed to be used by UEFI
+\begin{frame}{SEC - Initialize OpenSBI}
+  \begin{enumerate}
+    \item Pass scratch pointer with
+    \begin{itemize}
+      \item Device Tree % OpenSBI wants to fix it up in sbi_init, not sure if that's still necessary
+      \item Next mode (M-Mode still)
+      \item Platform specific functions
+      %- PLIC, CLIC config
+      %- PMP config to make SEC and PEI code rx only, adapted from OpenSBI source file
+    \end{itemize}
+    \item Register custom SBI calls (avoid linking PEI to OpenSBI)
+    %- To get mscratch for current or arbitrary hart
+    %- TODO: Should deregister this later because it's only supposed to be used by UEFI
     % I think (Open)SBI doesn't yet have a way to do this
-  - Find PEI entrypoint in boot firmware volume (hardcoded offset)
-  - Switch to S-Mode
-  - Enable identity mapped MMU
-  - Jump to PEI and switch to S mode
-    - Originally we used M-Mode still but it's good to reduce privileges early on and enable MMU
-
-PEI
-  - Pass it information about location and size of:
-    - boot firmware volume
-    - temporary ram
-    - stack
-  - "Discover" RAM and tell UEFI about it (hardcoded)
-  - Take device tree from scratch space and store in HOB
-  - Discover some more processor features and save it, later add it to SMBIOS
-  - Build new stack in actual RAM
-  - Switch stack and execute DxeIpl (initial program loader)
-  - Previously this was where we switched to S-Mode and initialize OpenSBI
-    But we want to initialize OpenSBI earlier and have less privileges earlier
-
-DXE
-  - Install timer protocol
-    - Also install interrupt handler for timer interrupt in S-Mode
-  - Install RuntimeServices
-  - Install SMBIOS tables using information from PEI
-   - Type 4 (CPU)
-   - Type 7 (Caches)
-   - Type 44 (Additional CPU information) New
-     https://github.com/riscv/riscv-smbios/
-  - Take device tree from HOB and store in EFI System Configuration Table
-    - Also put the boot hart-id in device tree, as required by Linux
-
-BDS (UEFI Shell)
-  - For booting linux I embedded the EFISTUB kernel and initrd in the flash image
-    With a command on the shell you can load it into ram and turn it into a ramdisk
-  - Load initrd into with `initrd` command and install protocol on fixed device path
-
-EFISTUB (Implemented by Atish, tested and finalized in cooperation with us)
-  - Take device tree from EFI System Configuration Table
-  - Call LoadFile2 on fixed device path to extract initrd
-  - Execute kernel proper
-    - Disable MMU
-    - `jump\_kernel(hartid, fdt);`
-
-
-% -------
+  \end{enumerate}
 \end{frame}
 
-\begin{frame}{Demo}
-
+\begin{frame}{SEC - Switch to PEI}
+  \begin{enumerate} % TODO Start at proper offset
+    \item Find PEI entrypoint in firmware volume
+    \item Switch to S-Mode
+    % Originally we used M-Mode still but it's good to reduce privileges early on and enable MMU
+    \item Enable identity mapped MMU
+    \item Jump to PEI and pass it information about
+    \begin{itemize}
+      \item Boot firmware volume
+      \item Temporary ram
+      \item Stack
+    \end{itemize}
+  \end{enumerate}
+  % Platform/RISC-V/PlatformPkg/Universal/Sec/SecMain.c
 \end{frame}
 
-\begin{frame}{UEFI on RISC-V}
-  % Explain what this is all about
-  % That we ported the reference implementation of UEFI, namely EDK2 to RISC-V
-  % Mhh forgot what else
+\begin{frame}{PEI}
+  From here on most of the code is arch-agnostic in EDK2.
+  \vfill
+  \begin{enumerate}
+    \item Discover RAM and migrate there
+    \item Dispatch PEIMs
+      \begin{itemize}
+        \item Take device tree from scratch space and store in HOB
+        \item Discover processor features and store in HOB (For SMBIOS)
+        \item Others ...
+      \end{itemize}
+    % Start DXE
+    \item Build new stack
+    \item Switch stack and execute DxeIpl
+    % Previously this was where we switched to S-Mode and initialize OpenSBI
+    % But we want to initialize OpenSBI earlier and have less privileges earlier
+  \end{enumerate}
+\end{frame}
 
-  % 
+\begin{frame}{DXE - Dispatch DXEs}
+  \begin{itemize}
+    \item Install timer interrupt handler and DXE Protocol
+    \item Install RuntimeServices (WIP)
+    \item Install SMBIOS tables using information from PEI
+      \begin{itemize}
+        \item Type 4 (CPU)
+        \item Type 7 (Caches)
+        \item \textbf{Type 44} (Additional CPU information)
+      \end{itemize}
+    \item Install device tree
+      \begin{itemize}
+        \item Extract from HOB
+        \item Insert boot hartid (required by Linux)
+        \item Insert into EFI System Configuration Table
+      \end{itemize}
+  \end{itemize}
+  % https://github.com/riscv/riscv-smbios/
+\end{frame}
+
+\begin{frame}{BDS - UEFI Shell}
+  Not upstream yet. \\
+  Prep: Embed EFISTUB and initrd disk image in flash image
+
+  \vfill
+
+  \begin{enumerate}
+    \item Load disk into memory and turn into ramdisk with shell command
+    \item Install initrd on handle of fixed device path (`initrd`)
+    \item Execute EFISTUB
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{EFISTUB - Since Linux 5.10}
+  Implemented by Atish Patra, tested and finalized in cooperation with us
+
+  \vfill
+
+  \begin{enumerate}
+    \item Take device tree from EFI System Configuration Table
+    \item Call LoadFile2 on device path to extract initrd
+    \item Execute kernel proper
+    \begin{itemize}
+      \item Disable MMU
+      \item jump\_kernel(hartid, fdt);
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Demo booting to Linux}
+
+  \begin{center}
+     \includegraphics[width=0.75\textwidth]{resources/asciinema.png}
+    \href{https://asciinema.org/a/KPDSvhXNVTbsQ45oRUVEu81nY}{https://asciinema.org/a/KPDSvhXNVTbsQ45oRUVEu81nY}
+  \end{center}
+
+  \tiny{Firmware image at \href{https://github.com/riscv/riscv-uefi-edk2-docs/releases}{https://github.com/riscv/riscv-uefi-edk2-docs/releases}}
+
 \end{frame}
 
 % TODO: Use proper checkmark and x symbol
 \begin{frame}{Status - EDK2}
   \begin{itemize}
-    \item y UEFI Shell
-    \item y UEFI Applications (e.g. bootloader)
-    \item y Booting Linux via EFISTUB
+    \item UEFI Shell
+    \item UEFI Applications (e.g. bootloader)
+    \item Booting Linux via EFISTUB
   \end{itemize}
 \end{frame}
 
@@ -325,31 +393,35 @@ EFISTUB (Implemented by Atish, tested and finalized in cooperation with us)
     \item UEFI specification amended
     \item SMBIOS specification amended
     \item EDK2 port merged upstream
+    \item Linux EFISTUB ported by Atish, merged in 5.10
     % Haven't tested it on EDK2 yet, but works on U-Boot
     \item UEFI Self Certification Test ported, patches need cleanup
-    \item Linux EFISTUB ported by Atish, merged in 5.10
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Goals}
   \begin{itemize}
     % OpenSBI 0.9 has support for that
-    \item Implement \textit{ResetSystem} Runtime Service with SBI (WIP) % [2]
+    \item Implement \textit{ResetSystem} Runtime Service with SBI (WIP)\textsuperscript{\tiny [1]}
     \item Upstream changes for booting Linux (FDT fixup and storing)
     \item SD card driver for Hifive Unleashed
-    \item Implement new relocation types by newer GNU toolchains % [1]
-    \item Build "OVMF" for QEMU's virt platform with VirtIO drivers \\
+    \item Implement new relocation types by newer GNU toolchains\textsuperscript{\tiny [2]}
+    \item Build "OVMF" for QEMU's virt platform with VirtIO drivers\textsuperscript{\tiny [3]} \\
           $\rightarrow$ Add boot tests to EDK2 CI \\
           $\rightarrow$ Boot with actual disk! \\
-    \item Port to BeagleV when it arrives
+    \item Port to BeagleV when it arrives\textsuperscript{\tiny [4]}
+    \item SecureBoot?
   \end{itemize}
 \end{frame}
 
 \begin{frame}{How to help}
   \begin{itemize}
-    % TODO: What's required for that?
-    \item Port to new boards, talk to us
+    % - Need to adjust platform
+    % - Check what drivers are needed
+    % - Create FDF
+    \item Port to more boards, talk to us
     \item Check out the issues on the repo
+    \item Spread the word
   \end{itemize}
 \end{frame}
 
@@ -366,9 +438,28 @@ EFISTUB (Implemented by Atish, tested and finalized in cooperation with us)
 \end{frame}
 
 \begin{frame}{Thanks}
-  Question Time!
+  \begin{center}
+    \textbf{Thanks for listening!}
+  \end{center}
 
-  Daniel Schaefer <git@danielschaefer.me>
+  \vfill
+
+  Check us out on GitHub: \\
+
+  \begin{tabular}{ll}
+    Development & Upstream \\
+    \hline
+    \href{https://github.com/riscv/riscv-uefi-edk2-docs}{riscv/riscv-uefi-edk2-docs} \\
+    \href{https://github.com/riscv/riscv-edk2}{riscv/riscv-edk2} & \href{https://github.com/tianocore/edk2}{tianocore/edk2} \\
+    \href{https://github.com/riscv/riscv-edk2-platforms}{riscv/edk2-platforms} & \href{https://github.com/tianocore/edk2-platforms}{tianocore/edk2-platforms} \\
+  \end{tabular}
+
+  \vfill
+
+  \begin{tabular}{ll}
+    Daniel Schaefer & <daniel.schaefer@hpe.com> \\
+    Abner Chang     & <abner.chang@hpe.com> \\
+  \end{tabular}
 \end{frame}
 
 % TODO:
@@ -376,36 +467,40 @@ EFISTUB (Implemented by Atish, tested and finalized in cooperation with us)
 % - Upload slides
 
 \begin{frame}{References}
-% # Sources
-% - Itanium SAL/PAL: https://www.csee.umbc.edu/portal/help/architecture/24535901.pdf
-% - BBL: https://www.lowrisc.org/docs/build-berkeley-boot-loader/
-% - U-Boot
-% - Coreboot
-% - Oreboot
-% - QEMU
-% - https://github.com/riscv/riscv-sbi-doc
-% - https://github.com/riscv/riscv-uefi-edk2-docs
-% - https://github.com/riscv/riscv-edk2
-% - https://github.com/riscv/riscv-edk2-platforms
-% - [1] https://github.com/riscv/riscv-edk2/issues/3
-% - [2] https://github.com/riscv/riscv-sbi-doc/commit/2f101582210b17a61e2f2bd356a01c6bda467ed0
-% - [3] https://beagleboard.org/beaglev
-% - [4] Abner and Dong's presentation from 2016: https://www.youtube.com/watch?v=9c73WHduovs
-
+  \begin{table}
+    \small
+    \begin{tabular}{ll}
+      UEFI and PI Spec      & \tiny{https://www.uefi.org/specifications} \\
+      SBI Spec              & \tiny{https://github.com/riscv/riscv-sbi-doc} \\
+      & \\
+      {[1]} SBI SystemReset & \tiny{https://github.com/riscv/riscv-sbi-doc/commit/2f101582210b17a6} \\
+      {[2]} GOT relocation  & \tiny{https://github.com/riscv/riscv-edk2/issues/3} \\
+      {[3]} RISC-V OVMF     & \tiny{https://github.com/riscv/riscv-edk2/issues/2} \\
+      {[4]} BeagleV         & \tiny{https://beagleboard.org/beaglev} \\
+      {[5]} EDK2 RISC-V in 2016 & \tiny{https://www.youtube.com/watch?v=9c73WHduovs} \\
+      & \\
+      BBL                   & \tiny{https://www.lowrisc.org/docs/build-berkeley-boot-loader/} \\
+      OpenSBI               & \tiny{https://github.com/riscv/opensbi} \\
+      U-Boot                & \tiny{https://www.denx.de/wiki/U-Boot} \\
+      Coreboot              & \tiny{https://coreboot.org/} \\
+      Oreboot               & \tiny{https://github.com/oreboot/oreboot} \\
+      QEMU                  & \tiny{https://www.qemu.org/} \\
+      Itanium SAL/PAL       & \tiny{https://www.csee.umbc.edu/portal/help/architecture/24535901.pdf} \\
+    \end{tabular}
+  \end{table}
 \end{frame}
 
 \begin{frame}{Glossary}
-% UEFI
-% EDK2
-% Tianocore
-% RISC-V
-% MMU
-% SBI
-% Itanium
-% SBI
-% PAL
-% SAL
-% RISC
+  \begin{tabular}{ll}
+    UEFI      & Unified Extensible Firmware Interface \\
+    EDK2      & UEFI's reference implementation \\
+    Tianocore & Umbrella name of EDK2 and related projects \\
+    MMU       & Memory Management Unit \\
+    SBI       & RISC-V interface between S and M-mode \\
+    Itanium   & First 64 bit processor by Intel \\
+    SAL       & Itanium's System Abstraction Layer \\
+    RISC      & Reduced Instruction Set Comuter (vs CISC)\\
+  \end{tabular}
 \end{frame}
 
 \end{document}

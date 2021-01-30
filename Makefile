@@ -1,6 +1,6 @@
 .PHONY: clean
 
-presentation.pdf: presentation.tex $(wildcard resources/*)
+presentation.pdf: beamerthemeHPE.sty presentation.tex $(wildcard resources/*)
 	latexmk -pdflatex="pplatex -c pdflatex --" -pdf -interaction=nonstopmode presentation.tex 2>&1 | tee latexmk_log.txt
 
 clean:
