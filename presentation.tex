@@ -65,7 +65,8 @@
 \begin{frame}{Agenda}
   \begin{itemize}
     \item About Us
-    \item Introduction
+    \item Introduction (EDK2, RISC-V)
+    % To give context
     \item History of Booting on RISC-V
     \item Timeline of This Implementation
     \item Details of Bootflow
@@ -81,8 +82,6 @@
     \item UEFI Firmware Engineers for ProLiant Servers at HPE
     \item Learned a lot through this project:\\
           Changes required in entire UEFI/EDK2 boot flow
-    % TODO: Maybe
-    % From SEC through to starting the bootloader (EFISTUB)
   \end{itemize}
 
   \vfill
@@ -111,12 +110,14 @@
   \end{columns}
 \end{frame}
 
-%\begin{frame}{Disclaimer}
-%  % We did the work mostly at work as a side project
-%  % But ...
-%\end{frame}
+\begin{frame}{Disclaimer}
+  \begin{itemize}
+    \item Work was done on company time
+    \item But we can't speak of the strategic direction of HPE
+  \end{itemize}
+\end{frame}
 
-\begin{frame}{EDK2}
+\begin{frame}{UEFI and EDK2}
   \centering
   \includegraphics[width=0.3\textwidth]{resources/tianocore-logo.png}
 
@@ -164,8 +165,8 @@
   \begin{tabular}{ll}
     2015 & BBL \\ % Berkeley Boot Loader, original research bootloader
     2016 & EDK2 Prototype with QEMU RISC-V PC/AT board\textsuperscript{\tiny [5]} \\
-    2017 & U-Boot+OpenSBI \\
-    2018 & U-Boot+OpenSBI with UEFI interface \\
+    2017 & U-Boot \\
+    2018 & U-Boot with UEFI interface \\
     2018 & Coreboot \\
     2019 & Oreboot \\ % First version of Oreboot
     2020 & EDK2+OpenSBI Upstream \\
@@ -183,21 +184,17 @@
   \end{tabular}
 \end{frame}
 
-\begin{frame}{Bootflow on SiFive U540}
+\begin{frame}{UEFI Phases}
   \begin{center}
-    Example based on Hifive Unleashed and equivalent sifive\_u QEMU
-
-    \vfill
-
     \includegraphics[width=0.8\textwidth]{resources/bootflow.png}
   \end{center}
 \end{frame}
 
-\begin{frame}{Bootflow on SiFive U540}
-    \includegraphics[width=1.15\textwidth]{resources/bootflow-annotated.png}
-\end{frame}
-
 \begin{frame}{Reset at ZSBL}
+  Walkthrough of Hifive Unleashed Bootflow
+
+  \vfill
+
   \begin{itemize}
     \item Starts running in M-Mode without MMU
     \item ZSBL (zero stage bootloader)
@@ -209,10 +206,10 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{SEC - First phase of UEFI (ASM)}
+\begin{frame}{SEC - First Phase of UEFI (ASM)}
   \begin{itemize}
-    \item Fully custom
-    \item Starts in ASM % Very easy to write, compared to x86
+    \item Fully custom for RISC-V
+    \item Starts in assembly % Very easy to write, compared to x86
   \end{itemize}
 
   \begin{enumerate}
@@ -230,12 +227,11 @@
   % Platform/RISC-V/PlatformPkg/Universal/Sec/Riscv64/SecEntry.S
 \end{frame}
 
-\begin{frame}{SEC - First phase of UEFI (C)}
+\begin{frame}{SEC - First Phase of UEFI (C)}
   \begin{enumerate}
     \item Add UEFI private region in scratch space
     \begin{itemize}
-      \item machine information (march, mimpid, ...)
-      \item Function pointer to switch mode
+      \item Machine information (march, mimpid, ...)
     \end{itemize}
     \item Initialize OpenSBI (sbi\_init)
     \begin{itemize}
@@ -346,8 +342,11 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Demo booting to Linux}
+\begin{frame}{RISC-V EDK2 Phases}
+    \includegraphics[width=1.15\textwidth]{resources/bootflow-annotated.png}
+\end{frame}
 
+\begin{frame}{Demo Booting to Linux}
   \begin{center}
      \includegraphics[width=0.75\textwidth]{resources/asciinema.png}
     \href{https://asciinema.org/a/KPDSvhXNVTbsQ45oRUVEu81nY}{https://asciinema.org/a/KPDSvhXNVTbsQ45oRUVEu81nY}
@@ -414,7 +413,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{How to help}
+\begin{frame}{How to Help}
   \begin{itemize}
     % - Need to adjust platform
     % - Check what drivers are needed
@@ -425,7 +424,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Vision for the future}
+\begin{frame}{Vision for the Future}
   \begin{itemize}
     \item Make RISC-V boot like rest of industry \\
           U-boot for embedded, UEFI for consumer and server
@@ -500,6 +499,8 @@
     Itanium   & First 64 bit processor by Intel \\
     SAL       & Itanium's System Abstraction Layer \\
     RISC      & Reduced Instruction Set Comuter (vs CISC)\\
+    SMM       & System Management Mode \\
+    HPE       & Hewlett Packard Enterprise \\
   \end{tabular}
 \end{frame}
 
